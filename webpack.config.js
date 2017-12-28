@@ -1,7 +1,7 @@
 let path = require('path');
-let rootPath = path.resolve(__dirname,'public/src/index.js');
-let outputPath = path.resolve(__dirname,'dist');
-let fileName = 'buddle.js';
+let rootPath = path.resolve(__dirname,'public/src/pages/index.js');
+let outputPath = path.resolve(__dirname,'public/dist');
+let fileName = 'bundle.js';
 
 module.exports = {
     entry:rootPath,
@@ -12,25 +12,16 @@ module.exports = {
     module: {
         loaders: [
             {
-                test:/\.css$/,
-                loaders:['style','css'],
-                include:rootPath
-            },
-            {
-                test:/\.(png|jpg)$/,
-                loaders:"url-loader?limit=8192"
-            },
-            {
-                test:/\.jsx$/,
-                loaders:'babel',
-                include:rootPath,
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader:'babel-loader',
                 query: {
-                    present:['react']
+                    presets: ['es2015','react']
                 }
             }
         ]
     },
     resolve: {
-        extensions: ['', '.js', '.jsx']
+        extensions: [' ','.js']
     }
 };
