@@ -4,6 +4,7 @@ let outputPath = path.resolve(__dirname,'public/dist');
 let fileName = 'bundle.js';
 
 module.exports = {
+    evtool: 'cheap-source-map',
     entry:rootPath,
     output: {
         path:outputPath,
@@ -12,6 +13,10 @@ module.exports = {
     module: {
         loaders: [
             {
+                test:/\.css$/,
+                loader:'style-loader!css-loader'
+            },
+            {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 loader:'babel-loader',
@@ -19,9 +24,11 @@ module.exports = {
                     presets: ['es2015','react']
                 }
             }
+
         ]
     },
     resolve: {
         extensions: [' ','.js']
-    }
+    },
+    externals: { 'jquery': 'window.jQuery' }
 };
