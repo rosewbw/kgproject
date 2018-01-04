@@ -14,6 +14,10 @@ class MainTarget extends React.Component{
                 left:0,
                 top:0
             },
+            transPosition:{
+                left:0,
+                right:0
+            },
             flag:false
         };
         this.zoomIn = this.zoomIn.bind(this);
@@ -23,9 +27,14 @@ class MainTarget extends React.Component{
         let newState = {};
         let event = e||window.event;
         let ele = event.srcElement||event.target;
+        let transformElement = ReactDOM.findDOMNode(this.refs.target);
         newState.mousePosition = {
             left:event.clientX,
             top:event.clientY
+        };
+        newState.transPosition = {
+            left:transformElement.style.offsetLeft,
+            top:transformElement.style.offsetTop
         };
         newState.flag = true;
         ReactDOM.findDOMNode(this.refs.target).addEventListener('mousemove', (e) => {
@@ -34,11 +43,21 @@ class MainTarget extends React.Component{
         this.setState(newState);
     }
     onMouseMove(e){
-        if(this.state.flag)
-        let event = e||window.event;
-        let transformElement = ReactDOM.findDOMNode(this.refs.target);
-        let mousePosition = getClickPosition(event);
-        let transformPosition = getElementPositionOfWindow(transformElement);
+        if(this.state.flag){
+            let event = e||window.event;
+            let transformElement = ReactDOM.findDOMNode(this.refs.targetTransform);
+            let transformElementClass = document.getElementsByClassName('targetTransform')
+            let currentPosition = getClickPosition(event);
+            let transformPosition = getElementPositionOfWindow(transformElement);
+            transformElement.style.offsetLeft = transformPosition.left + currentPosition.left - this.state.mousePosition.left;
+            transformElement.style.offsetRight = transformPosition.right + currentPosition.right - this.state.mousePosition.right;
+            let transformOffset = getElementPositionOfWindow(transformElement);
+            console.log(transformElement.style.transformOrigin);
+            //let originX = (transformElement.style.transformOrigin.match(/\d+/g)[0] + this.state.transPosition.left - transformOffset.left);
+            //let originY = (transformElement.style.transformOrigin.match(/\d+/g)[1] + this.state.transPosition.left - transformOffset.right);
+            //console.log(originX,originY);
+        }
+
     }
     onMouseWheel(e){
         console.log(e);

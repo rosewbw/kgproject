@@ -4,7 +4,6 @@ let outputPath = path.resolve(__dirname,'public/dist');
 let fileName = 'bundle.js';
 
 module.exports = {
-    evtool: 'cheap-source-map',
     entry:rootPath,
     output: {
         path:outputPath,
