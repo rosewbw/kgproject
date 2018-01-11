@@ -26,6 +26,7 @@ class TeachUnit extends React.Component{
     }
 
     move(event){
+
         let e = event ? event : window.event;
         let dBox = ReactDOM.findDOMNode(this.refs.dragBox);
         if (this.state.flag) {
@@ -36,9 +37,7 @@ class TeachUnit extends React.Component{
             let currentTop = parseInt(this.state.top) + disY;
             let docX = document.documentElement.clientWidth || document.body.clientWidth;
             let docY = document.documentElement.clientHeight || document.body.clientHeight;
-            if (currentLeft <= 0) {//检测屏幕左边，因为我这里的初始居中是利用了负1/2的盒子宽度，所以用250px判断边界
-                dBox.style.left = 0 + "px";
-            } else if (currentLeft >= (docX - dBox.offsetWidth + 0)) {
+            if (currentLeft >= (docX - dBox.offsetWidth + 0)) {
                 dBox.style.left = (docX - this.state.offsetX) + "px";
             } else {
                 dBox.style.left = currentLeft + "px";
@@ -59,12 +58,12 @@ class TeachUnit extends React.Component{
             top: computedStyle.top,
             flag: false
         });
+        console.log("endDrag")
     }
     componentDidMount(){
         document.addEventListener('mousemove', (e) => {
             this.move(e);
         }, false);
-        /*ES6新特性，箭头函数，需要依赖jsx编译工具才能正确运行*/
         document.addEventListener('mouseup', (e) => {
             this.endDrag(e);
         }, false);
