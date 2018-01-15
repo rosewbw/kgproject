@@ -34,10 +34,10 @@ class MainTarget extends React.Component{
                 left:event.clientX,
                 top:event.clientY
             };
-            newState.transPosition = {
-                left:transformElement.offsetLeft,
-                top:transformElement.offsetTop
-            };
+            // newState.transPosition = {
+            //     left:transformElement.offsetLeft,
+            //     top:transformElement.offsetTop
+            // };
             newState.flag = true;
             this.setState(newState);
             console.log("onMouseDown");
@@ -47,16 +47,17 @@ class MainTarget extends React.Component{
         if(this.state.flag){
             let event = e||window.event;
             let transformElement = ReactDOM.findDOMNode(this.refs.targetTransform);
+
             let transformElementStyle = document.defaultView.getComputedStyle(transformElement,null);
             let currentPosition = getClickPosition(event);
-            let transformPosition = getElementPositionOfWindow(transformElement);
             transformElement.style.left = this.state.transPosition.left + currentPosition.left - this.state.mousePosition.left + "px";
             transformElement.style.top = this.state.transPosition.top + currentPosition.top - this.state.mousePosition.top + "px";
             let transformOffset = getElementPositionOfWindow(transformElement);
             let originX = (parseInt(transformElementStyle.transformOrigin.match(/\d+/g)[0]) + this.state.transPosition.left - transformOffset.left);
             let originY = (parseInt(transformElementStyle.transformOrigin.match(/\d+/g)[1]) + this.state.transPosition.top - transformOffset.top);
+            console.log(this.state.transPosition.left);
             transformElement.style.transformOrigin =`${originX}px ${originY}px 0`;
-            console.log(transformElementStyle.transformOrigin.match(/\d+/g)[0],this.state.transPosition.left,transformOffset.left);
+            //console.log(transformElementStyle.transformOrigin.match(/\d+/g)[0],this.state.transPosition.left,transformOffset.left);
         }
     }
     onMouseUp(e){
@@ -77,9 +78,9 @@ class MainTarget extends React.Component{
         console.log('onMouseUp')
 }
     onMouseWheel(e){
-        let newState = {};
-        newState.scale = e.deltaY < 0 ? this.zoomIn(this.state.scale):this.zoomOut(this.state.scale);
-        this.setState(newState)
+            let newState = {};
+            newState.scale = e.deltaY < 0 ? this.zoomIn(this.state.scale):this.zoomOut(this.state.scale);
+            this.setState(newState)
     }
     componentDidMount(){
         document.addEventListener('mousemove', (e) => {
