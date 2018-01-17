@@ -38,16 +38,16 @@ class TeachUnit extends React.Component{
             let docX = document.documentElement.clientWidth || document.body.clientWidth;
             let docY = document.documentElement.clientHeight || document.body.clientHeight;
             if (currentLeft >= (docX - dBox.offsetWidth + 0)) {
-                dBox.style.left = (docX - this.state.offsetX) + "px";
+                dBox.style.left = (docX - this.state.offsetX)/this.props.scale + "px";
             } else {
-                dBox.style.left = currentLeft + "px";
+                dBox.style.left = currentLeft/this.props.scale + "px";
             }
             if (currentTop <= 0) { //检测屏幕上边，因为我这里的初始居中是利用了负1/2的盒子高度，所以用200px判断边界
                 dBox.style.top = 0 + "px";
             } else if (currentTop >= (docY - dBox.offsetHeight + 0)) {
-                dBox.style.top = (docY - this.state.offsetY) + "px";
+                dBox.style.top = (docY - this.state.offsetY)/this.props.scale + "px";
             } else {
-                dBox.style.top = currentTop + "px";
+                dBox.style.top = currentTop/this.props.scale + "px";
             }
         }
     }
