@@ -58,7 +58,7 @@ class TeachUnit extends React.Component{
             top: computedStyle.top,
             flag: false
         });
-        console.log("endDrag")
+        //console.log("endDrag")
     }
     componentDidMount(){
         document.addEventListener('mousemove', (e) => {

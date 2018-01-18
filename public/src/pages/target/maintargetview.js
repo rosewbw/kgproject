@@ -20,13 +20,18 @@ class MainTarget extends React.Component{
             },
             flag:false
         };
+        this.defaultTransform = [0,0];
+        this.defaultTransformOrigin = [450,240];
+        this.clickPosition = {};
+        this.transformPosition = {};
+        // this.transformOrigin = [];
+        // this.transformOffset = [];
         this.zoomIn = this.zoomIn.bind(this);
-        this.zoomOut = this.zoomOut.bind(this)
-        this.onMouseDown = this.onMouseDown.bind(this)
-        this.onMouseMove = this.onMouseMove.bind(this)
-        this.onMouseUp = this.onMouseUp.bind(this)
-        this.onMouseWheel = this.onMouseWheel.bind(this)
-
+        this.zoomOut = this.zoomOut.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
+        this.onMouseWheel = this.onMouseWheel.bind(this);
     }
     onMouseDown(e){
         let newState = {};
@@ -34,33 +39,31 @@ class MainTarget extends React.Component{
         let ele = event.srcElement||event.target;
         let transformElement = ReactDOM.findDOMNode(this.refs.targetTransform);
         if(event.target.id === 'target'){
-            newState.mousePosition = {
+            this.clickPosition = {
                 left:event.clientX,
                 top:event.clientY
             };
-            newState.transPosition = {
+            this.transformPosition = {
                 left:transformElement.offsetLeft,
                 top:transformElement.offsetTop
             };
             newState.flag = true;
             this.setState(newState);
-            console.log("onMouseDown");
         }
+
     }
     onMouseMove(e){
         if(this.state.flag){
             let event = e||window.event;
             let transformElement = ReactDOM.findDOMNode(this.refs.targetTransform);
-            let transformElementStyle = document.defaultView.getComputedStyle(transformElement,null);
+            // let transformElementStyle = document.defaultView.getComputedStyle(transformElement,null);
             let currentPosition = getClickPosition(event);
-            transformElement.style.left = this.state.transPosition.left + currentPosition.left - this.state.mousePosition.left + "px";
-            transformElement.style.top = this.state.transPosition.top + currentPosition.top - this.state.mousePosition.top + "px";
+            transformElement.style.left = this.transformPosition.left + currentPosition.left - this.clickPosition.left + "px";
+            transformElement.style.top = this.transformPosition.top + currentPosition.top - this.clickPosition.top + "px";
             let transformOffset = getElementPositionOfWindow(transformElement);
-            let originX = (parseInt(transformElementStyle.transformOrigin.match(/\d+/g)[0]) + this.state.transPosition.left - transformOffset.left)*this.state.scale;
-            let originY = (parseInt(transformElementStyle.transformOrigin.match(/\d+/g)[1]) + this.state.transPosition.top - transformOffset.top)*this.state.scale;
-            console.log(this.state.transPosition.left);
+            let originX = (parseInt(this.defaultTransformOrigin[0]) + this.defaultTransform[0] - transformOffset.left)/this.state.scale;
+            let originY = (parseInt(this.defaultTransformOrigin[1]) + this.defaultTransform[1] - transformOffset.top)/this.state.scale;
             transformElement.style.transformOrigin =`${originX}px ${originY}px 0`;
-            //console.log(transformElementStyle.transformOrigin.match(/\d+/g)[0],this.state.transPosition.left,transformOffset.left);
         }
     }
     onMouseUp(e){
@@ -75,10 +78,8 @@ class MainTarget extends React.Component{
             left:transformElement.offsetLeft,
             top:transformElement.offsetTop
         };
-        //console.log(transformElement.offsetLeft,transformElement.offsetTop);
         newState.flag = false;
         this.setState(newState);
-        console.log('onMouseUp')
 }
     onMouseWheel(e){
             let newState = {};

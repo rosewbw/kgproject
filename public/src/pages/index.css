@@ -30,6 +30,8 @@ nav{
 }
 
 .dragBox{
+    left: 10px;
+    top:10px;
     width: 100px;
     height: 100px;
     position: absolute;
