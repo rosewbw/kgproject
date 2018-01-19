@@ -20,8 +20,8 @@ class MainTarget extends React.Component{
             },
             flag:false
         };
-        this.defaultTransform = [0,0];
-        this.defaultTransformOrigin = [450,240];
+        this.defaultTransform = {};//[0,0];
+        this.defaultTransformOrigin = {};//[450,240];
         this.clickPosition = {};
         this.transformPosition = {};
         // this.transformOrigin = [];
@@ -61,8 +61,10 @@ class MainTarget extends React.Component{
             transformElement.style.left = this.transformPosition.left + currentPosition.left - this.clickPosition.left + "px";
             transformElement.style.top = this.transformPosition.top + currentPosition.top - this.clickPosition.top + "px";
             let transformOffset = getElementPositionOfWindow(transformElement);
-            let originX = (parseInt(this.defaultTransformOrigin[0]) + this.defaultTransform[0] - transformOffset.left)/this.state.scale;
-            let originY = (parseInt(this.defaultTransformOrigin[1]) + this.defaultTransform[1] - transformOffset.top)/this.state.scale;
+            console.log(transformElement.offsetLeft);
+            let originX = (parseInt(this.defaultTransformOrigin.left) + this.defaultTransform.left - transformOffset.left)/this.state.scale;
+            let originY = (parseInt(this.defaultTransformOrigin.top) + this.defaultTransform.top - transformOffset.top)/this.state.scale;
+            //console.log(this.defaultTransformOrigin.left,this.defaultTransform.left,transformOffset.left);
             transformElement.style.transformOrigin =`${originX}px ${originY}px 0`;
         }
     }
@@ -87,6 +89,17 @@ class MainTarget extends React.Component{
             this.setState(newState)
     }
     componentDidMount(){
+        let transformElement = ReactDOM.findDOMNode(this.refs.targetTransform);
+        let transformElementStyle = document.defaultView.getComputedStyle(transformElement,null);
+        this.defaultTransformOrigin = {
+            left:transformElementStyle.transformOrigin.match(/\d+/g)[0],
+            top:transformElementStyle.transformOrigin.match(/\d+/g)[1]
+        };
+        this.defaultTransform = {
+            left:transformElement.offsetLeft,
+            top:transformElement.offsetTop
+        };
+        console.log(this.defaultTransformOrigin,this.defaultTransform);
         document.addEventListener('mousemove', (e) => {
             this.onMouseMove(e);
         }, false);
