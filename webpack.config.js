@@ -1,4 +1,5 @@
 let path = require('path');
+let webpack = require("webpack");
 let rootPath = path.resolve(__dirname,'public/src/pages/index.js');
 let outputPath = path.resolve(__dirname,'public/dist');
 let fileName = 'bundle.js';
@@ -29,5 +30,7 @@ module.exports = {
     resolve: {
         extensions: [' ','.js']
     },
-    externals: { 'jquery': 'window.jQuery' }
+    externals:{
+        'jquery':'window.jQuery'
+    }
 };

@@ -58,10 +58,12 @@ class MainTarget extends React.Component{
             let transformElement = ReactDOM.findDOMNode(this.refs.targetTransform);
             // let transformElementStyle = document.defaultView.getComputedStyle(transformElement,null);
             let currentPosition = getClickPosition(event);
-            transformElement.style.left = this.transformPosition.left + currentPosition.left - this.clickPosition.left + "px";
-            transformElement.style.top = this.transformPosition.top + currentPosition.top - this.clickPosition.top + "px";
+            $(transformElement).offset(function () {
+                
+            })
+            // transformElement.style.left = this.transformPosition.left + currentPosition.left - this.clickPosition.left + "px";
+            // transformElement.style.top = this.transformPosition.top + currentPosition.top - this.clickPosition.top + "px";
             let transformOffset = getElementPositionOfWindow(transformElement);
-            console.log(transformElement.offsetLeft);
             let originX = (parseInt(this.defaultTransformOrigin.left) + this.defaultTransform.left - transformOffset.left)/this.state.scale;
             let originY = (parseInt(this.defaultTransformOrigin.top) + this.defaultTransform.top - transformOffset.top)/this.state.scale;
             //console.log(this.defaultTransformOrigin.left,this.defaultTransform.left,transformOffset.left);
