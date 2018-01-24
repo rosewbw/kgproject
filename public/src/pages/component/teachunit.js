@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {getElementPositionOfWindow,getClickPosition} from '../commonfun/commonfun.js'
 
 class TeachUnit extends React.Component{
     constructor(props){
@@ -30,25 +31,11 @@ class TeachUnit extends React.Component{
         let e = event ? event : window.event;
         let dBox = ReactDOM.findDOMNode(this.refs.dragBox);
         if (this.state.flag) {
-            let nowX = e.clientX, nowY = e.clientY;
-            let disX = nowX - this.state.currentX, disY = nowY - this.state.currentY;
-            /*增加拖拽范围检测*/
-            let currentLeft = parseInt(this.state.left) + disX;
-            let currentTop = parseInt(this.state.top) + disY;
-            let docX = document.documentElement.clientWidth || document.body.clientWidth;
-            let docY = document.documentElement.clientHeight || document.body.clientHeight;
-            if (currentLeft >= (docX - dBox.offsetWidth + 0)) {
-                dBox.style.left = (docX - this.state.offsetX)/this.props.scale + "px";
-            } else {
-                dBox.style.left = currentLeft/this.props.scale + "px";
-            }
-            if (currentTop <= 0) { //检测屏幕上边，因为我这里的初始居中是利用了负1/2的盒子高度，所以用200px判断边界
-                dBox.style.top = 0 + "px";
-            } else if (currentTop >= (docY - dBox.offsetHeight + 0)) {
-                dBox.style.top = (docY - this.state.offsetY)/this.props.scale + "px";
-            } else {
-                dBox.style.top = currentTop/this.props.scale + "px";
-            }
+            let mousePosition = getClickPosition(e);
+            let transformPosition = getElementPositionOfWindow(dBox);
+            dBox.style.left = (mousePosition.left - transformPosition.left)/this.props.scale;
+            dBox.style.top = (mousePosition.top - transformPosition.top)/this.props.scale;
+
         }
     }
     endDrag() {
@@ -58,7 +45,6 @@ class TeachUnit extends React.Component{
             top: computedStyle.top,
             flag: false
         });
-        //console.log("endDrag")
     }
     componentDidMount(){
         document.addEventListener('mousemove', (e) => {

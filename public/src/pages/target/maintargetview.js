@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Target} from './maintarget.js'
-import styles from './maintarget.css'
+import './maintarget.css'
 import {TeachUnit} from '../component/teachunit.js'
 import {getElementPositionOfWindow,getClickPosition} from '../commonfun/commonfun.js'
 
@@ -44,8 +44,8 @@ class MainTarget extends React.Component{
                 top:event.clientY
             };
             this.transformPosition = {
-                left:transformElement.offsetLeft,
-                top:transformElement.offsetTop
+                left:$(transformElement).offset().left,
+                top:$(transformElement).offset().top
             };
             newState.flag = true;
             this.setState(newState);
@@ -58,15 +58,18 @@ class MainTarget extends React.Component{
             let transformElement = ReactDOM.findDOMNode(this.refs.targetTransform);
             // let transformElementStyle = document.defaultView.getComputedStyle(transformElement,null);
             let currentPosition = getClickPosition(event);
-            $(transformElement).offset(function () {
-                
-            })
-            // transformElement.style.left = this.transformPosition.left + currentPosition.left - this.clickPosition.left + "px";
-            // transformElement.style.top = this.transformPosition.top + currentPosition.top - this.clickPosition.top + "px";
+            let offsetLeft = this.transformPosition.left + currentPosition.left - this.clickPosition.left;
+            let offsetTop = this.transformPosition.top + currentPosition.top - this.clickPosition.top;
+            console.log(this.transformPosition.top , currentPosition.top , this.clickPosition.top)
+            $(transformElement).offset(function (index, oldoffset) {
+                return {
+                    left:offsetLeft,
+                    top:offsetTop
+                }
+            });
             let transformOffset = getElementPositionOfWindow(transformElement);
             let originX = (parseInt(this.defaultTransformOrigin.left) + this.defaultTransform.left - transformOffset.left)/this.state.scale;
             let originY = (parseInt(this.defaultTransformOrigin.top) + this.defaultTransform.top - transformOffset.top)/this.state.scale;
-            //console.log(this.defaultTransformOrigin.left,this.defaultTransform.left,transformOffset.left);
             transformElement.style.transformOrigin =`${originX}px ${originY}px 0`;
         }
     }
@@ -101,7 +104,6 @@ class MainTarget extends React.Component{
             left:transformElement.offsetLeft,
             top:transformElement.offsetTop
         };
-        console.log(this.defaultTransformOrigin,this.defaultTransform);
         document.addEventListener('mousemove', (e) => {
             this.onMouseMove(e);
         }, false);

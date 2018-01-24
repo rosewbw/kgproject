@@ -1,0 +1,8 @@
+.editorContainer{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20%;
+    background-color: gray;
+    height: 80%;
+}

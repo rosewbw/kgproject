@@ -1,7 +1,7 @@
 function getElementPositionOfWindow(ele) {
     return {
-        left:ele.offsetLeft,
-        top:ele.offsetTop
+        left:$(ele).offset().left,
+        top:$(ele).offset().top
     }
 }
 
