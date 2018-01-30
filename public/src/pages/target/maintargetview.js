@@ -113,6 +113,7 @@ class MainTarget extends React.Component{
         ReactDOM.findDOMNode(this.refs.target).addEventListener('mousewheel', (e) => {
             this.onMouseWheel(e);
         }, false);
+        console.log("componentDidMount")
 
     }
     zoomIn(scale){

@@ -1,4 +1,7 @@
 import React from 'react';
+import WebUploader from 'webuploader'
+import FileUpload from 'react-fileupload'
+
 
 class Upload extends React.Component{
     constructor(props){
@@ -11,11 +14,18 @@ class Upload extends React.Component{
 
     }
     componentDidMount(){
-        //new Target();
     }
     render(){
-        return(
-            <div>Upload</div>
+        const options={
+            baseUrl:'localhost:3000',
+            param:{
+                fid:0
+            }
+        }
+        return (
+            <div>
+                <div>fsdfd</div>
+            </div>
         )
     }
 }

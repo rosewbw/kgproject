@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var lessMiddleware = require('less-middleware');
 let session = require('express-session');
+var config = require('config');
 
 var index = require('./routes/index');
 

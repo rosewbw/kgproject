@@ -16,7 +16,7 @@ class MediaLib extends React.Component{
         return(
             <div id="medialib" className="mediaLib">
                 <Upload/>
-                <MediaGallery/>
+                {/*<MediaGallery/>*/}
             </div>
         )
     }

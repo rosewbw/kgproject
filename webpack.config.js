@@ -32,7 +32,10 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: [' ','.js']
+        extensions: [' ','.js'],
+        alias: {
+            'react': path.resolve(__dirname, './node_modules', 'react')
+        }
     },
     externals:{
         'jquery':'window.jQuery'
