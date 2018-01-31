@@ -6,4 +6,8 @@ router.get('/', function(req, res, next) {
   res.render('editor', { title: 'Knowledge Graphics' });
 });
 
+router.post('/upload', function(req, res, next) {
+    res.send("ok");
+});
+
 module.exports = router;

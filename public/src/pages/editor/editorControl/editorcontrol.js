@@ -1,6 +1,6 @@
 import React from 'react';
 import './editorcontrol.css'
-import {MediaLib} from './medialib.js'
+import {MediaLib} from '../medialib/medialib.js'
 import {CourseEdit} from './courseedit.js'
 import {CourseInfo} from './courseinfo.js'
 
@@ -26,7 +26,7 @@ class EditorControl extends React.Component {
         ];
     }
     getItemComponent(index){
-        return <div className={this.tabItem[index].className}>{this.tabItem[index].childComponent}</div>
+        return this.tabItem[index].childComponent
     }
 
     checkTitleIndex(index) {
@@ -52,7 +52,6 @@ class EditorControl extends React.Component {
                     {
                         React.Children.map(this.props.children, (element, index) => {
                             if(this.checkItemIndex(index)){
-                                console.log(index);
                                 return this.getItemComponent(index);
                             }
                         })

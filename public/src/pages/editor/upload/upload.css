@@ -1,0 +1,15 @@
+.dragArea{
+    width: 100%;
+    height:50px;
+}
+
+.uploader{
+    height: 40%;
+    width: 100%;
+}
+.queueList{
+    width: 394px;
+    height: 100%;
+    background-color: white;
+    border: 3px dashed green;
+}

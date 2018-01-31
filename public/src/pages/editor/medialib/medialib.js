@@ -1,6 +1,6 @@
 import React from 'react';
 import {Upload} from '../upload/upload.js'
-
+import './medialib.css'
 
 class MediaLib extends React.Component{
     constructor(props){
@@ -16,7 +16,6 @@ class MediaLib extends React.Component{
         return(
             <div id="medialib" className="mediaLib">
                 <Upload/>
-                {/*<MediaGallery/>*/}
             </div>
         )
     }
