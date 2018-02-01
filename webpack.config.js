@@ -27,8 +27,11 @@ module.exports = {
             {
                 test: /\.scss$/,
                 loader: 'style!css!sass'
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                loader: 'url-loader?limit=8192&name=../images/[name].[ext]?[hash]',
             }
-
         ]
     },
     resolve: {
