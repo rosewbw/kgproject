@@ -7,14 +7,13 @@ class Upload extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: []
         };
 
         // WebUploader实例
         this.uploader = null;
         this.updateTotalProgress = this.updateTotalProgress.bind(this);
         this.bindDom = this.bindDom.bind(this);
-        this.setState = this.setState.bind(this);
+        this.updateState = this.updateState.bind(this);
         this.addFile = this.addFile.bind(this);
         this.removeFile = this.removeFile.bind(this);
 
@@ -57,7 +56,7 @@ class Upload extends React.Component {
         this.thumbnailHeight = 110 * this.ratio;
 
         // 可能有pedding, ready, uploading, confirm, done.
-        this.state = 'pedding';
+        this.uploadState = 'pedding';
     }
 
     updateTotalProgress(){
@@ -91,10 +90,10 @@ class Upload extends React.Component {
     updateStatus() {
         let text = '', stats;
 
-        if ( this.state === 'ready' ) {
+        if ( this.uploadState === 'ready' ) {
             text = '选中' + this.fileCount + '张图片，共' +
                 WebUploader.formatSize( this.fileSize ) + '。';
-        } else if ( this.state === 'confirm' ) {
+        } else if ( this.uploadState === 'confirm' ) {
             stats = this.uploader.getStats();
             if ( stats.uploadFailNum ) {
                 text = '已成功上传' + stats.successNum+ '张照片至XX相册，'+
@@ -115,19 +114,19 @@ class Upload extends React.Component {
         this.$info.html( text );
     }
 
-    setState( val ) {
+    updateState( val ) {
 
         let file, stats;
 
-        if ( val === this.state ) {
+        if ( val === this.uploadState ) {
             return;
         }
 
-        this.$upload.removeClass( 'state-' + this.state );
+        this.$upload.removeClass( 'state-' + this.uploadState );
         this.$upload.addClass( 'state-' + val );
-        this.state = val;
+        this.uploadState = val;
 
-        switch ( this.state ) {
+        switch ( this.uploadState ) {
             case 'pedding':
                 this.$placeHolder.removeClass( 'element-invisible' );
                 this.$queue.parent().removeClass('filled');
@@ -162,17 +161,18 @@ class Upload extends React.Component {
 
                 stats = this.uploader.getStats();
                 if ( stats.successNum && !stats.uploadFailNum ) {
-                    this.setState( 'finish' );
+                    this.updateState( 'finish' );
                     return;
                 }
                 break;
             case 'finish':
                 stats = this.uploader.getStats();
                 if ( stats.successNum ) {
-                    alert( '上传成功' );
+                    this.$upload.text( '开始上传' ).removeClass( 'disabled' );
+                    alert('上传成功');
                 } else {
                     // 没有成功的图片，重设
-                    this.state = 'done';
+                    this.uploadState = 'done';
                     location.reload();
                 }
                 break;
@@ -191,8 +191,8 @@ class Upload extends React.Component {
             $prgress = $li.find('p.progress span'),
             $info = $('<p class="error"></p>'),
             $wrap = $li.find( 'p.imgWrap' );
-        let showError = function (state) {
-            switch(state){
+        let showError = function (uploadState) {
+            switch(uploadState){
                 case 'exceed_size':
                     text = '文件大小超出';
                     break;
@@ -233,10 +233,8 @@ class Upload extends React.Component {
                 $li.off( 'mouseenter mouseleave' );
                 // $btns.remove();
             }
-            console.log(_this);
             // 成功
             if ( cur === 'error' || cur === 'invalid' ) {
-                console.log( file.statusText );
                 showError( file.statusText );
                 _this.percentages[ file.id ][ 1 ] = 1;
             } else if ( cur === 'interrupt' ) {
@@ -265,7 +263,7 @@ class Upload extends React.Component {
     componentDidMount() {
         let _this = this;
 
-        _this.state = 'pedding';
+        _this.uploadState = 'pedding';
         // 总体进度条
 
         _this.uploader = WebUploader.create({
@@ -308,35 +306,38 @@ class Upload extends React.Component {
                 _this.$statusBar.show();
             }
             _this.addFile(file);
-            _this.setState('ready');
+            _this.updateState('ready');
             _this.updateTotalProgress();
         });
 
-        _this.uploader.on('fileDequeued', function (file) {
-            console.log('fileDequeued');
-            _this.fileCount--;
-            _this.fileSize -= file.size;
-            if ( !_this.fileCount ) {
-                _this.setState( 'pedding' );
-            }
-            _this.removeFile( file );
-            _this.updateTotalProgress();
-        });
+        _this.uploader.onFileDequeued = function( file ) {
+        };
+
+        // _this.uploader.on('fileDequeued', function (file) {
+        //     console.log('fileDequeued');
+        //     _this.fileCount--;
+        //     _this.fileSize -= file.size;
+        //     if ( !_this.fileCount ) {
+        //         _this.updateState( 'pedding' );
+        //     }
+        //     _this.removeFile( file );
+        //     _this.updateTotalProgress();
+        // });
 
 
         _this.uploader.on( 'all', function( type ) {
             let stats;
             switch( type ) {
                 case 'uploadFinished':
-                    _this.setState( 'confirm' );
+                    _this.updateState( 'confirm' );
                     break;
 
                 case 'startUpload':
-                    _this.setState( 'uploading' );
+                    _this.updateState( 'uploading' );
                     break;
 
                 case 'stopUpload':
-                    _this.setState( 'paused' );
+                    _this.updateState( 'paused' );
                     break;
 
             }
@@ -354,40 +355,63 @@ class Upload extends React.Component {
             }
 
             $li.find('p.state').text('上传中');
-        console.log('上传中');
 
         $percent.css('width', percentage * 100 + '%');
     });
         _this.uploader.on('uploadSuccess', function (file) {
         $('#' + file.id).find('p.state').text('已上传');
-        console.log('已上传');
+            _this.fileCount--;
+            _this.fileSize -= file.size;
+            if ( !_this.fileCount ) {
+                console.log('ok?')
+                _this.$upload.removeClass('disabled');
+                console.log(_this.$upload);
+                _this.updateState( 'pedding' );
+            }
+            _this.removeFile( file );
+            _this.updateTotalProgress();
+
     });
 
         _this.uploader.on('uploadError', function (file) {
             $('#' + file.id).find('p.state').text('上传出错');
-            console.log('上传出错');
+
         });
 
         _this.uploader.on('uploadComplete', function (file) {
             $('#' + file.id).find('.progress').fadeOut();
-            console.log('完成');
         });
 
         _this.bindDom();
 
         _this.$upload.on('click', function() {
+            console.log('1')
             if ( $(this).hasClass( 'disabled' ) ) {
+                console.log('2')
                 return false;
             }
 
-            if ( _this.state === 'ready' ) {
+            if ( _this.uploadState === 'ready' ) {
+                console.log('3')
                 _this.uploader.upload();
-            } else if ( _this.state === 'paused' ) {
+            } else if ( _this.uploadState === 'paused' ) {
+                console.log('4')
                 _this.uploader.upload();
-            } else if ( _this.state === 'uploading' ) {
+            } else if ( _this.uploadState === 'uploading' ) {
+                console.log('5')
                 _this.uploader.stop();
             }
         });
+
+        _this.uploader.onUploadProgress = function( file, percentage ) {
+            let $li = $('#'+file.id),
+                $percent = $li.find('.progress span');
+
+            $percent.css( 'width', percentage * 100 + '%' );
+            _this.percentages[ file.id ][ 1 ] = percentage;
+            _this.updateTotalProgress();
+        };
+
 
 
         _this.updateTotalProgress();
