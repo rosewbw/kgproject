@@ -8,11 +8,13 @@
   },
   "dependencies": {
     "body-parser": "~1.18.2",
+    "config": "^1.29.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "ejs": "~2.5.7",
     "expose-loader": "^0.7.4",
     "express": "~4.15.5",
+    "express-session": "^1.15.6",
     "jquery": "^3.2.1",
     "less-middleware": "~2.2.1",
     "morgan": "~1.9.0",

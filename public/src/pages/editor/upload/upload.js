@@ -16,13 +16,13 @@ class Upload extends React.Component {
         this.bindDom = this.bindDom.bind(this);
         this.setState = this.setState.bind(this);
         this.addFile = this.addFile.bind(this);
+        this.removeFile = this.removeFile.bind(this);
 
         // 总体进度条
         this.$progress = null;
 
         // 图片容器
-        this.$queue = $('<ul class="filelist"></ul>')
-            .appendTo( $('.queueList') );
+        this.$queue = null;
 
 
         this.$list= null;
@@ -78,10 +78,12 @@ class Upload extends React.Component {
     }
 
     bindDom(){
+        this.$queue = $('<ul class="filelist"></ul>')
+            .appendTo( $('.queueList') );
         this.$list = $('#uploadInfo');
         this.$progress = $('.progress').hide();
         this.$info = $('.info');
-        this.$placeHolder= $('.placeholder');
+        this.$placeHolder= $('.dragArea');
         this.$upload= $('.uploadBtn');
         this.$statusBar = $('.statusBar');
     }
@@ -89,10 +91,10 @@ class Upload extends React.Component {
     updateStatus() {
         let text = '', stats;
 
-        if ( state === 'ready' ) {
+        if ( this.state === 'ready' ) {
             text = '选中' + this.fileCount + '张图片，共' +
                 WebUploader.formatSize( this.fileSize ) + '。';
-        } else if ( state === 'confirm' ) {
+        } else if ( this.state === 'confirm' ) {
             stats = this.uploader.getStats();
             if ( stats.uploadFailNum ) {
                 text = '已成功上传' + stats.successNum+ '张照片至XX相册，'+
@@ -114,6 +116,7 @@ class Upload extends React.Component {
     }
 
     setState( val ) {
+
         let file, stats;
 
         if ( val === this.state ) {
@@ -178,10 +181,86 @@ class Upload extends React.Component {
         this.updateStatus();
     }
 
-    addFile(){
+    addFile(file){
+        let text,
+            $li = $( '<li id="' + file.id + '">' +
+            '<p class="title">' + file.name + '</p>' +
+            '<p class="imgWrap"></p>'+
+            '<p class="progress"><span></span></p>' +
+            '</li>' ),
+            $prgress = $li.find('p.progress span'),
+            $info = $('<p class="error"></p>'),
+            $wrap = $li.find( 'p.imgWrap' );
+        let showError = function (state) {
+            switch(state){
+                case 'exceed_size':
+                    text = '文件大小超出';
+                    break;
 
+                case 'interrupt':
+                    text = '上传暂停';
+                    break;
+
+                default:
+                    text = '上传失败，请重试';
+                    break;
+            }
+
+
+        };
+        let _this = this;
+        if ( file.getStatus() === 'invalid' ) {
+            showError( file.statusText );
+        } else{
+            $wrap.text( '预览中' );
+            _this.uploader.makeThumb( file, function( error, src ) {
+                if ( error ) {
+                    $wrap.text( '不能预览' );
+                    return;
+                }
+
+                let img = $('<img src="'+src+'">');
+                $wrap.empty().append( img );
+            }, _this.thumbnailWidth, _this.thumbnailHeight );
+
+            _this.percentages[ file.id ] = [ file.size, 0 ];
+            file.rotation = 0;
+        }
+        file.on('statuschange', function( cur, prev ) {
+            if ( prev === 'progress' ) {
+                $prgress.hide().width(0);
+            } else if ( prev === 'queued' ) {
+                $li.off( 'mouseenter mouseleave' );
+                // $btns.remove();
+            }
+            console.log(_this);
+            // 成功
+            if ( cur === 'error' || cur === 'invalid' ) {
+                console.log( file.statusText );
+                showError( file.statusText );
+                _this.percentages[ file.id ][ 1 ] = 1;
+            } else if ( cur === 'interrupt' ) {
+                showError( 'interrupt' );
+            } else if ( cur === 'queued' ) {
+                _this.percentages[ file.id ][ 1 ] = 0;
+            } else if ( cur === 'progress' ) {
+                $info.remove();
+                $prgress.css('display', 'block');
+            } else if ( cur === 'complete' ) {
+                $li.append( '<span class="success"></span>' );
+            }
+
+            $li.removeClass( 'state-' + prev ).addClass( 'state-' + cur );
+        });
+        $li.appendTo( _this.$queue );
     }
+    removeFile( file ) {
+        let $li = $('#'+file.id);
 
+        delete this.percentages[ file.id ];
+        this.updateTotalProgress();
+        $li.off().find('.file-panel').off().end().remove();
+    }
 
     componentDidMount() {
         let _this = this;
@@ -220,17 +299,48 @@ class Upload extends React.Component {
             label: '继续添加'
         });
 
+        //待传文件队列
         _this.uploader.on('fileQueued', function (file) {
             _this.fileCount++;
             _this.fileSize += file.size;
-            console.log(_this.fileCount)
             if(_this.fileCount === 1){
-                console.log(_this.fileCount)
                 _this.$placeHolder.addClass( 'element-invisible' );
                 _this.$statusBar.show();
             }
+            _this.addFile(file);
+            _this.setState('ready');
+            _this.updateTotalProgress();
         });
 
+        _this.uploader.on('fileDequeued', function (file) {
+            console.log('fileDequeued');
+            _this.fileCount--;
+            _this.fileSize -= file.size;
+            if ( !_this.fileCount ) {
+                _this.setState( 'pedding' );
+            }
+            _this.removeFile( file );
+            _this.updateTotalProgress();
+        });
+
+
+        _this.uploader.on( 'all', function( type ) {
+            let stats;
+            switch( type ) {
+                case 'uploadFinished':
+                    _this.setState( 'confirm' );
+                    break;
+
+                case 'startUpload':
+                    _this.setState( 'uploading' );
+                    break;
+
+                case 'stopUpload':
+                    _this.setState( 'paused' );
+                    break;
+
+            }
+        });
         _this.uploader.on('uploadProgress', function (file, percentage) {
             let $li = $('#' + file.id),
                 $percent = $li.find('.progress .progress-bar');
@@ -264,6 +374,22 @@ class Upload extends React.Component {
         });
 
         _this.bindDom();
+
+        _this.$upload.on('click', function() {
+            if ( $(this).hasClass( 'disabled' ) ) {
+                return false;
+            }
+
+            if ( _this.state === 'ready' ) {
+                _this.uploader.upload();
+            } else if ( _this.state === 'paused' ) {
+                _this.uploader.upload();
+            } else if ( _this.state === 'uploading' ) {
+                _this.uploader.stop();
+            }
+        });
+
+
         _this.updateTotalProgress();
     }
 
