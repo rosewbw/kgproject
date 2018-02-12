@@ -1,8 +1,8 @@
 import React from 'react';
 import './editorcontrol.css'
 import {MediaLib} from '../medialib/medialib.js'
-import {CourseEdit} from './courseedit.js'
-import {CourseInfo} from './courseinfo.js'
+import {CourseEdit} from '../courseeditor/courseedit.js'
+import {CourseInfo} from '../courseinfo/courseinfo.js'
 
 class EditorControl extends React.Component {
     constructor(props) {

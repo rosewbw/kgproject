@@ -1,21 +1,26 @@
 import React from 'react';
+import ReactDom from 'react-dom';
+import './courseedit.css'
 
 class CourseEdit extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            data:[]
         };
     }
     componentWillMount(){
 
     }
     componentDidMount(){
-        //new Target();
+
     }
     render(){
         return(
-            <div>CourseEdit</div>
+            <div id="course-edit" className="courseEdit">
+                <div id="empty-node" className="emptyNode">
+                    <span>Empty node</span>
+                </div>
+            </div>
         )
     }
 }

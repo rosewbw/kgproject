@@ -343,6 +343,7 @@ class Upload extends React.Component {
             }
         });
         _this.uploader.on('uploadProgress', function (file, percentage) {
+            console.log(percentage);
             let $li = $('#' + file.id),
                 $percent = $li.find('.progress .progress-bar');
 
